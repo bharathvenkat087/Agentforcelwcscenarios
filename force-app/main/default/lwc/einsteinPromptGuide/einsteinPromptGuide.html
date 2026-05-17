@@ -1,0 +1,209 @@
+<template>
+    <div class="guide-wrapper">
+
+        <!-- Header -->
+        <div class="guide-header">
+            <div class="header-left">
+                <div class="header-icon">
+                    <lightning-icon icon-name="utility:einstein" size="medium" alternative-text="Einstein"></lightning-icon>
+                </div>
+                <div>
+                    <h1 class="guide-title">Salesforce Einstein Prompt Builder</h1>
+                    <p class="guide-subtitle">Every prompt template type — with real people, real jobs, and real AI outputs.</p>
+                </div>
+            </div>
+            <div class="badge-row">
+                <span class="badge badge-sales">Sales</span>
+                <span class="badge badge-service">Service</span>
+                <span class="badge badge-ai">Agentforce</span>
+                <span class="badge badge-security">Security</span>
+                <span class="badge badge-knowledge">Knowledge</span>
+            </div>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-number">20</div>
+                <div class="stat-label">Template Types</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">20</div>
+                <div class="stat-label">Real Scenarios</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number stat-green">{expandedCount}</div>
+                <div class="stat-label">Explored</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number stat-purple">{filteredCount}</div>
+                <div class="stat-label">Showing</div>
+            </div>
+        </div>
+
+        <!-- Search + Filter Row -->
+        <div class="controls-row">
+            <div class="search-box">
+                <lightning-icon icon-name="utility:search" size="x-small" class="search-icon" alternative-text="Search"></lightning-icon>
+                <input
+                    type="text"
+                    class="search-input"
+                    placeholder="Search templates..."
+                    value={searchTerm}
+                    oninput={handleSearch}
+                />
+            </div>
+            <div class="filter-row">
+                <template for:each={filterButtons} for:item="btn">
+                    <button
+                        key={btn.id}
+                        class={btn.cssClass}
+                        onclick={handleFilter}
+                        data-id={btn.id}>
+                        {btn.label}
+                    </button>
+                </template>
+            </div>
+        </div>
+
+        <!-- No Results -->
+        <template if:true={noResults}>
+            <div class="no-results">
+                <lightning-icon icon-name="utility:search" size="large" alternative-text="No results"></lightning-icon>
+                <p>No templates found for "<strong>{searchTerm}</strong>"</p>
+                <button class="clear-btn" onclick={clearSearch}>Clear search</button>
+            </div>
+        </template>
+
+        <!-- Cards Grid -->
+        <div class="cards-grid">
+            <template for:each={filteredTemplates} for:item="t">
+                <div key={t.id} class={t.cardCss}>
+
+                    <!-- Card Header (clickable) -->
+                    <div class="card-header" onclick={handleToggle} data-id={t.id}>
+                        <div class="card-icon" style={t.iconStyle}>
+                            <lightning-icon
+                                icon-name={t.iconName}
+                                size="small"
+                                style={t.iconColorStyle}
+                                alternative-text={t.name}>
+                            </lightning-icon>
+                        </div>
+                        <div class="card-meta">
+                            <div class="card-title-row">
+                                <span class="card-number">{t.id}</span>
+                                <span class="card-name">{t.name}</span>
+                                <span class="card-tag" style={t.tagStyle}>{t.tag}</span>
+                            </div>
+                            <div class="card-tagline">{t.tagline}</div>
+                        </div>
+                        <div class="expand-icon">
+                            <lightning-icon
+                                icon-name={t.chevronIcon}
+                                size="x-small"
+                                alternative-text="Toggle">
+                            </lightning-icon>
+                        </div>
+                    </div>
+
+                    <!-- Card Body (expanded) -->
+                    <template if:true={t.isOpen}>
+                        <div class="card-body">
+
+                            <!-- Persona -->
+                            <div class="section-block">
+                                <div class="section-label">The Person</div>
+                                <div class="persona-row">
+                                    <div class="avatar" style={t.avatarStyle}>
+                                        {t.persona.initials}
+                                    </div>
+                                    <div class="persona-info">
+                                        <div class="persona-name">{t.persona.name}</div>
+                                        <div class="persona-role">{t.persona.role}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Problem -->
+                            <div class="section-block">
+                                <div class="section-label">The Problem</div>
+                                <div class="story-box problem-box">
+                                    <p>{t.situation}</p>
+                                </div>
+                            </div>
+
+                            <!-- AI Action -->
+                            <div class="section-block">
+                                <div class="section-label">What Einstein Did</div>
+                                <div class="story-box action-box">
+                                    <p>{t.aiAction}</p>
+                                </div>
+                            </div>
+
+                            <!-- Output -->
+                            <div class="section-block">
+                                <div class="section-label">AI Output</div>
+                                <div class="output-box">
+                                    <div class="output-header">
+                                        <lightning-icon icon-name="utility:einstein" size="x-small" alternative-text="Einstein output"></lightning-icon>
+                                        <span>Einstein Response</span>
+                                    </div>
+                                    <pre class="output-text">{t.output}</pre>
+                                </div>
+                            </div>
+
+                            <!-- Impact Chips -->
+                            <div class="impact-row">
+                                <template for:each={t.impact} for:item="chip">
+                                    <span key={chip} class="impact-chip">
+                                        <lightning-icon icon-name="utility:success" size="xx-small" alternative-text="impact"></lightning-icon>
+                                        {chip}
+                                    </span>
+                                </template>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="action-row">
+                                <lightning-button
+                                    label="Copy Scenario"
+                                    icon-name="utility:copy"
+                                    onclick={handleCopy}
+                                    data-id={t.id}
+                                    variant="neutral"
+                                    size="small">
+                                </lightning-button>
+                                <lightning-button
+                                    label="Mark as Reviewed"
+                                    icon-name="utility:check"
+                                    onclick={handleReview}
+                                    data-id={t.id}
+                                    variant={t.reviewedVariant}
+                                    size="small">
+                                </lightning-button>
+                            </div>
+                        </div>
+                    </template>
+
+                </div>
+            </template>
+        </div>
+
+        <!-- Footer -->
+        <div class="guide-footer">
+            <p>Built with ❤️ using Salesforce LWC · {reviewedCount} of 20 templates reviewed</p>
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-fill" style={progressStyle}></div>
+            </div>
+        </div>
+
+        <!-- Toast -->
+        <template if:true={showToast}>
+            <div class="toast-msg">
+                <lightning-icon icon-name="utility:success" size="x-small" alternative-text="success"></lightning-icon>
+                {toastMessage}
+            </div>
+        </template>
+
+    </div>
+</template>
