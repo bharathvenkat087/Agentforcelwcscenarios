@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Interior_Features__c</fullName>
+    <label>Interior Features</label>
+    <type>LongTextArea</type>
+    <length>2000</length>
+    <visibleLines>3</visibleLines>
+    <required>false</required>
+    <description>Desired interior features separated by semicolons e.g. Open Plan Kitchen; Home Office; Fireplace</description>
+</CustomField>

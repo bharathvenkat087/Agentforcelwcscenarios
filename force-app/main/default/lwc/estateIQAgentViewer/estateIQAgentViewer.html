@@ -1,0 +1,232 @@
+<template>
+    <div class="av-wrapper">
+
+        <!-- TOP BAR -->
+        <header class="topbar">
+            <div class="tb-brand">
+                <div class="tb-icon">E</div>
+                <span class="tb-name">EstateIQ</span>
+                <span class="tb-tag">Agent Console</span>
+            </div>
+            <div class="tb-actions">
+                <span class="tb-count">{totalCount} leads loaded</span>
+                <button class="tb-btn" onclick={refreshLeads}>↻ Refresh</button>
+                <button class="tb-btn primary" onclick={exportCSV}>⬇ Export CSV</button>
+            </div>
+        </header>
+
+        <div class="av-body">
+
+            <!-- SIDEBAR LIST -->
+            <aside class="av-sidebar">
+                <div class="sb-top">
+                    <div class="sb-search">
+                        <span>🔍</span>
+                        <input type="text" placeholder="Search name, city..." value={searchTerm} onchange={handleSearch} />
+                    </div>
+                    <div class="filter-chips">
+                        <template for:each={filterOptions} for:item="f">
+                            <button key={f.val} class={f.cls} data-val={f.val} onclick={handleFilter}>{f.label}</button>
+                        </template>
+                    </div>
+                </div>
+
+                <div class="sb-count">{filteredCount} leads</div>
+
+                <template if:true={isLoading}>
+                    <div class="loading-row">
+                        <div class="spin"></div> Loading from Salesforce...
+                    </div>
+                </template>
+
+                <template if:false={isLoading}>
+                    <template if:true={hasLeads}>
+                        <template for:each={filteredLeads} for:item="lead">
+                            <div key={lead.Id} class={lead.itemCls} data-id={lead.Id} onclick={handleSelectLead}>
+                                <div class="li-avatar">{lead.initials}</div>
+                                <div class="li-info">
+                                    <div class="li-name">{lead.FirstName} {lead.LastName}</div>
+                                    <div class="li-meta">{lead.Preferred_City__c} · {lead.budgetFormatted}</div>
+                                </div>
+                                <div class="li-right">
+                                    <span class="li-date">{lead.dateFormatted}</span>
+                                    <span class={lead.statusCls}>{lead.statusLabel}</span>
+                                </div>
+                            </div>
+                        </template>
+                    </template>
+                    <template if:false={hasLeads}>
+                        <div class="empty-state">
+                            <div class="es-icon">📭</div>
+                            <div>No leads found</div>
+                        </div>
+                    </template>
+                </template>
+            </aside>
+
+            <!-- MAIN CONTENT -->
+            <main class="av-main">
+
+                <!-- STATS ROW -->
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="sc-val">{stats.total}</div>
+                        <div class="sc-lbl">Total Leads</div>
+                        <div class="sc-sub">{stats.newCount} not contacted</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="sc-val">{stats.avgBudget}</div>
+                        <div class="sc-lbl">Avg Budget</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="sc-val">{stats.cities}</div>
+                        <div class="sc-lbl">Cities</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="sc-val">{stats.topType}</div>
+                        <div class="sc-lbl">Top Buyer Type</div>
+                        <div class="sc-sub">{stats.topCity}</div>
+                    </div>
+                </div>
+
+                <!-- TABLE -->
+                <div class="table-section">
+                    <div class="table-header">
+                        <span class="table-title">All Leads</span>
+                        <button class="sort-btn" onclick={toggleSort}>{sortLabel}</button>
+                    </div>
+
+                    <template if:true={hasLeads}>
+                        <table class="leads-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>City</th>
+                                    <th>Budget</th>
+                                    <th>Type</th>
+                                    <th>Buyer</th>
+                                    <th>Timeline</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template for:each={filteredLeads} for:item="lead">
+                                    <tr key={lead.Id} class={lead.rowCls} data-id={lead.Id} onclick={handleSelectLead}>
+                                        <td class="td-name">{lead.FirstName} {lead.LastName}</td>
+                                        <td class="td-email">{lead.Email}</td>
+                                        <td class="td-city">{lead.cityShort}</td>
+                                        <td class="td-budget">{lead.budgetFormatted}</td>
+                                        <td>{lead.Property_Types__c}</td>
+                                        <td>{lead.Buyer_Type__c}</td>
+                                        <td>{lead.Move_Timeline__c}</td>
+                                        <td><span class={lead.statusCls}>{lead.statusLabel}</span></td>
+                                        <td class="td-date">{lead.dateFormatted}</td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </template>
+
+                    <template if:false={hasLeads}>
+                        <div class="empty-state" style="padding:60px;">
+                            <div class="es-icon">🔍</div>
+                            <div>No leads match your criteria</div>
+                        </div>
+                    </template>
+                </div>
+            </main>
+
+            <!-- DETAIL PANEL -->
+            <template if:true={selectedLead}>
+                <aside class="detail-panel">
+                    <div class="dp-head">
+                        <div>
+                            <div class="dp-avatar">{selectedLead.initials}</div>
+                            <div class="dp-name">{selectedLead.FirstName} {selectedLead.LastName}</div>
+                            <div class="dp-role">
+                                {selectedLead.Buyer_Type__c}
+                                <span class={selectedLead.statusCls}>{selectedLead.statusLabel}</span>
+                            </div>
+                        </div>
+                        <button class="dp-close" onclick={closeDetail}>✕</button>
+                    </div>
+
+                    <div class="dp-body">
+
+                        <div class="dp-section">
+                            <div class="dp-sec-title">Contact</div>
+                            <div class="dp-row"><span class="dp-key">Email</span><span class="dp-val link">{selectedLead.Email}</span></div>
+                            <div class="dp-row"><span class="dp-key">Phone</span><span class="dp-val">{selectedLead.Phone}</span></div>
+                            <div class="dp-row"><span class="dp-key">Preferred</span><span class="dp-val">{selectedLead.Preferred_Contact_Method__c}</span></div>
+                            <div class="dp-row"><span class="dp-key">Submitted</span><span class="dp-val">{selectedLead.dateFullFormatted}</span></div>
+                        </div>
+
+                        <div class="dp-section">
+                            <div class="dp-sec-title">Property Requirements</div>
+                            <div class="dp-row"><span class="dp-key">Intent</span><span class="dp-val">{selectedLead.Purchase_Intent__c}</span></div>
+                            <div class="dp-row"><span class="dp-key">Type</span><span class="dp-val">{selectedLead.Property_Types__c}</span></div>
+                            <div class="dp-row"><span class="dp-key">Budget</span><span class="dp-val big">{selectedLead.budgetFormatted}</span></div>
+                            <div class="dp-row"><span class="dp-key">Beds / Baths</span><span class="dp-val">{selectedLead.Bedrooms__c} bed / {selectedLead.Bathrooms__c} bath</span></div>
+                            <div class="dp-row"><span class="dp-key">Garage</span><span class="dp-val">{selectedLead.Garage_Spaces__c}</span></div>
+                            <div class="dp-row"><span class="dp-key">Floors</span><span class="dp-val">{selectedLead.Floors__c}</span></div>
+                        </div>
+
+                        <div class="dp-section">
+                            <div class="dp-sec-title">Location &amp; Timeline</div>
+                            <div class="dp-row"><span class="dp-key">City</span><span class="dp-val">{selectedLead.Preferred_City__c}</span></div>
+                            <div class="dp-row"><span class="dp-key">Neighbourhood</span><span class="dp-val">{selectedLead.Neighbourhood__c}</span></div>
+                            <div class="dp-row"><span class="dp-key">Timeline</span><span class="dp-val">{selectedLead.Move_Timeline__c}</span></div>
+                        </div>
+
+                        <template if:true={selectedLead.Interior_Features__c}>
+                            <div class="dp-section">
+                                <div class="dp-sec-title">Interior Features</div>
+                                <div class="dp-pills">
+                                    <template for:each={selectedLead.interiorArr} for:item="p">
+                                        <span key={p} class="dp-pill green">{p}</span>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+
+                        <template if:true={selectedLead.Outdoor_Features__c}>
+                            <div class="dp-section">
+                                <div class="dp-sec-title">Outdoor &amp; Lifestyle</div>
+                                <div class="dp-pills">
+                                    <template for:each={selectedLead.outdoorArr} for:item="p">
+                                        <span key={p} class="dp-pill green">{p}</span>
+                                    </template>
+                                    <template for:each={selectedLead.lifestyleArr} for:item="p">
+                                        <span key={p} class="dp-pill orange">{p}</span>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+
+                        <template if:true={selectedLead.Description}>
+                            <div class="dp-section">
+                                <div class="dp-sec-title">Notes</div>
+                                <p class="dp-notes">{selectedLead.Description}</p>
+                            </div>
+                        </template>
+
+                        <div class="dp-section">
+                            <div class="dp-sec-title">Salesforce</div>
+                            <div class="dp-row"><span class="dp-key">Lead ID</span><span class="dp-val mono">{selectedLead.Id}</span></div>
+                            <div class="dp-row"><span class="dp-key">Status</span><span class="dp-val">{selectedLead.Status}</span></div>
+                        </div>
+
+                    </div>
+
+                    <div class="dp-actions">
+                        <button class="dp-btn" onclick={copyEmail}>📋 Copy Email</button>
+                        <button class="dp-btn primary" onclick={markContacted}>✓ Mark Contacted</button>
+                    </div>
+                </aside>
+            </template>
+
+        </div>
+    </div>
+</template>
