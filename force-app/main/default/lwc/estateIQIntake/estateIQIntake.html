@@ -1,0 +1,357 @@
+<template>
+    <div class="wrapper">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon">E</div>
+                <span class="brand-name">EstateIQ</span>
+            </div>
+            <h1 class="sidebar-title">Find your <em>perfect</em> property</h1>
+            <p class="sidebar-sub">Tell us what you're looking for and our Agentforce AI will match you with the best listings in minutes.</p>
+
+            <nav class="steps-nav">
+                <template for:each={stepsList} for:item="s">
+                    <div key={s.num}
+                         class={s.cls}
+                         data-step={s.num}
+                         onclick={handleStepClick}>
+                        <div class="step-circle">
+                            <template if:false={s.done}>
+                                <span class="step-num">{s.num}</span>
+                            </template>
+                            <template if:true={s.done}>
+                                <span>✓</span>
+                            </template>
+                        </div>
+                        <div class="step-text">
+                            <div class="step-label">{s.label}</div>
+                            <div class="step-desc">{s.desc}</div>
+                        </div>
+                    </div>
+                </template>
+            </nav>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="main">
+            <div class="progress-bar">
+                <div class="progress-fill" style={progressStyle}></div>
+            </div>
+
+            <div class="form-area">
+
+                <!-- SUCCESS SCREEN -->
+                <template if:true={showSuccess}>
+                    <div class="success-wrap">
+                        <div class="success-card">
+                            <div class="success-icon">✅</div>
+                            <h2 class="success-h2">You're all <em>set!</em></h2>
+                            <p class="success-sub">Your enquiry has been submitted to Salesforce and a dedicated agent will be in touch shortly.</p>
+                            <div class="success-meta">
+                                <div class="meta-row"><span class="meta-key">Name</span><span class="meta-val">{state.firstName} {state.lastName}</span></div>
+                                <div class="meta-row"><span class="meta-key">Email</span><span class="meta-val">{state.email}</span></div>
+                                <div class="meta-row"><span class="meta-key">Buyer Type</span><span class="meta-val">{state.buyerType}</span></div>
+                                <div class="meta-row"><span class="meta-key">Budget</span><span class="meta-val">{formattedBudget}</span></div>
+                                <div class="meta-row"><span class="meta-key">Location</span><span class="meta-val">{state.city}</span></div>
+                                <div class="meta-row"><span class="meta-key">Timeline</span><span class="meta-val">{state.timeline}</span></div>
+                            </div>
+                            <div class="sf-badge">☁️ Lead Created in Salesforce</div>
+                            <p class="sf-id">Lead ID: {createdLeadId}</p>
+                            <button class="btn-reset" onclick={resetForm}>Submit Another Enquiry</button>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- STEP 1 — YOUR DETAILS -->
+                <template if:true={isStep1}>
+                    <div class="step-panel">
+                        <div class="step-tag">Step 1 of 5</div>
+                        <h2 class="step-h2">Let's start with <em>you</em></h2>
+                        <p class="step-sub">We'll use these details to personalise your experience and connect you with an agent.</p>
+
+                        <div class="ai-banner">
+                            <div class="ai-icon">🤖</div>
+                            <div class="ai-text">
+                                <strong>Agentforce AI is ready</strong>
+                                <span>I'll analyse your preferences and surface the best-matched listings instantly.</span>
+                            </div>
+                            <div class="ai-dot"></div>
+                        </div>
+
+                        <div class="field-row">
+                            <div>
+                                <label class="field-label">FIRST NAME <span class="req">*</span></label>
+                                <input class={firstNameCls} type="text" placeholder="e.g. Sarah"
+                                       value={state.firstName} data-field="firstName" onchange={handleInput} />
+                            </div>
+                            <div>
+                                <label class="field-label">LAST NAME <span class="req">*</span></label>
+                                <input class={lastNameCls} type="text" placeholder="e.g. Johnson"
+                                       value={state.lastName} data-field="lastName" onchange={handleInput} />
+                            </div>
+                        </div>
+
+                        <div class="field-full">
+                            <label class="field-label">EMAIL ADDRESS <span class="req">*</span></label>
+                            <input class={emailCls} type="email" placeholder="sarah@email.com"
+                                   value={state.email} data-field="email" onchange={handleInput} />
+                        </div>
+
+                        <div class="field-row">
+                            <div>
+                                <label class="field-label">PHONE NUMBER <span class="req">*</span></label>
+                                <input class={phoneCls} type="tel" placeholder="+1 (555) 000-0000"
+                                       value={state.phone} data-field="phone" onchange={handleInput} />
+                            </div>
+                            <div>
+                                <label class="field-label">PREFERRED CONTACT</label>
+                                <select class="field-select" data-field="contact" onchange={handleInput}>
+                                    <option value="">Select method...</option>
+                                    <option value="Phone Call">Phone Call</option>
+                                    <option value="WhatsApp">WhatsApp</option>
+                                    <option value="Email">Email</option>
+                                    <option value="SMS">SMS</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="sec-label">I AM A</div>
+                        <div class="tile-grid">
+                            <template for:each={buyerTypes} for:item="t">
+                                <div key={t.val} class={t.cls} data-group="buyerType" data-val={t.val} onclick={handleTile}>
+                                    <span class="tile-icon">{t.icon}</span>
+                                    <span class="tile-label">{t.val}</span>
+                                </div>
+                            </template>
+                        </div>
+
+                        <div class="nav-btns">
+                            <span></span>
+                            <button class="btn-next" onclick={nextStep}>Continue →</button>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- STEP 2 — PROPERTY TYPE -->
+                <template if:true={isStep2}>
+                    <div class="step-panel">
+                        <div class="step-tag">Step 2 of 5</div>
+                        <h2 class="step-h2">What's your <em>ideal</em> home?</h2>
+                        <p class="step-sub">Select the property type you're looking for. You can pick more than one.</p>
+
+                        <div class="sec-label">PROPERTY TYPE</div>
+                        <div class="tile-grid">
+                            <template for:each={propTypesList} for:item="t">
+                                <div key={t.val} class={t.cls} data-group="propTypes" data-val={t.val} onclick={handleTileMulti}>
+                                    <span class="tile-icon">{t.icon}</span>
+                                    <span class="tile-label">{t.val}</span>
+                                </div>
+                            </template>
+                        </div>
+
+                        <div class="sec-label">I WANT TO</div>
+                        <div class="toggle-row">
+                            <button class={intentBuyCls} data-val="Buy" onclick={handleIntent}>🔑 Buy</button>
+                            <button class={intentRentCls} data-val="Rent" onclick={handleIntent}>📋 Rent</button>
+                        </div>
+
+                        <div class="field-full">
+                            <label class="field-label">ADDITIONAL NOTES</label>
+                            <textarea class="field-textarea" placeholder="Anything specific about the property type..." data-field="propNotes" onchange={handleInput}></textarea>
+                        </div>
+
+                        <div class="nav-btns">
+                            <button class="btn-back" onclick={prevStep}>← Back</button>
+                            <button class="btn-next" onclick={nextStep}>Continue →</button>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- STEP 3 — BUDGET & SIZE -->
+                <template if:true={isStep3}>
+                    <div class="step-panel">
+                        <div class="step-tag">Step 3 of 5</div>
+                        <h2 class="step-h2">Budget &amp; <em>size</em></h2>
+                        <p class="step-sub">Set your budget range and tell us how much space you need.</p>
+
+                        <div class="range-wrap">
+                            <div class="range-header">
+                                <label class="field-label" style="margin-bottom:0">MAXIMUM BUDGET</label>
+                                <span class="range-val">{formattedBudget}</span>
+                            </div>
+                            <input type="range" min="100000" max="10000000" step="50000"
+                                   value={state.budget} onchange={handleBudget} oninput={handleBudget} />
+                            <div class="range-labels">
+                                <span>$100K</span><span>$10M+</span>
+                            </div>
+                        </div>
+
+                        <div class="sec-label">ROOMS &amp; SPACES</div>
+                        <div class="counters-grid">
+                            <div class="counter-card">
+                                <div class="counter-lbl">Bedrooms</div>
+                                <div class="counter-ctrl">
+                                    <button class="ctr-btn" data-field="beds" data-dir="-1" onclick={handleCounter}>−</button>
+                                    <span class="ctr-val">{state.beds}</span>
+                                    <button class="ctr-btn" data-field="beds" data-dir="1" onclick={handleCounter}>+</button>
+                                </div>
+                            </div>
+                            <div class="counter-card">
+                                <div class="counter-lbl">Bathrooms</div>
+                                <div class="counter-ctrl">
+                                    <button class="ctr-btn" data-field="baths" data-dir="-1" onclick={handleCounter}>−</button>
+                                    <span class="ctr-val">{state.baths}</span>
+                                    <button class="ctr-btn" data-field="baths" data-dir="1" onclick={handleCounter}>+</button>
+                                </div>
+                            </div>
+                            <div class="counter-card">
+                                <div class="counter-lbl">Garage</div>
+                                <div class="counter-ctrl">
+                                    <button class="ctr-btn" data-field="garage" data-dir="-1" onclick={handleCounter}>−</button>
+                                    <span class="ctr-val">{state.garage}</span>
+                                    <button class="ctr-btn" data-field="garage" data-dir="1" onclick={handleCounter}>+</button>
+                                </div>
+                            </div>
+                            <div class="counter-card">
+                                <div class="counter-lbl">Floors</div>
+                                <div class="counter-ctrl">
+                                    <button class="ctr-btn" data-field="floors" data-dir="-1" onclick={handleCounter}>−</button>
+                                    <span class="ctr-val">{state.floors}</span>
+                                    <button class="ctr-btn" data-field="floors" data-dir="1" onclick={handleCounter}>+</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field-row">
+                            <div>
+                                <label class="field-label">MIN FLOOR AREA (SQFT)</label>
+                                <input class="field-input" type="number" placeholder="e.g. 1500"
+                                       value={state.areaMin} data-field="areaMin" onchange={handleInput} />
+                            </div>
+                            <div>
+                                <label class="field-label">MAX FLOOR AREA (SQFT)</label>
+                                <input class="field-input" type="number" placeholder="e.g. 4000"
+                                       value={state.areaMax} data-field="areaMax" onchange={handleInput} />
+                            </div>
+                        </div>
+
+                        <div class="nav-btns">
+                            <button class="btn-back" onclick={prevStep}>← Back</button>
+                            <button class="btn-next" onclick={nextStep}>Continue →</button>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- STEP 4 — LOCATION & TIMELINE -->
+                <template if:true={isStep4}>
+                    <div class="step-panel">
+                        <div class="step-tag">Step 4 of 5</div>
+                        <h2 class="step-h2">Location &amp; <em>timeline</em></h2>
+                        <p class="step-sub">Where do you want to live, and how soon are you looking to move?</p>
+
+                        <div class="field-row">
+                            <div>
+                                <label class="field-label">PREFERRED CITY <span class="req">*</span></label>
+                                <input class={cityCls} type="text" placeholder="e.g. Miami, Los Angeles"
+                                       value={state.city} data-field="city" onchange={handleInput} />
+                            </div>
+                            <div>
+                                <label class="field-label">NEIGHBOURHOOD / AREA</label>
+                                <input class="field-input" type="text" placeholder="e.g. Brickell, Malibu"
+                                       value={state.neighbourhood} data-field="neighbourhood" onchange={handleInput} />
+                            </div>
+                        </div>
+
+                        <div class="field-full">
+                            <label class="field-label">PROXIMITY TO</label>
+                            <input class="field-input" type="text" placeholder="e.g. Within 5 miles of a top-rated school"
+                                   value={state.proximity} data-field="proximity" onchange={handleInput} />
+                        </div>
+
+                        <div class="sec-label">WHEN ARE YOU LOOKING TO MOVE?</div>
+                        <div class="timeline-grid">
+                            <template for:each={timelineList} for:item="t">
+                                <div key={t.val} class={t.cls} data-group="timeline" data-val={t.val} onclick={handleTile}>
+                                    <div class="tc-icon">{t.icon}</div>
+                                    <div class="tc-label">{t.val}</div>
+                                    <div class="tc-sub">{t.sub}</div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <div class="nav-btns">
+                            <button class="btn-back" onclick={prevStep}>← Back</button>
+                            <button class="btn-next" onclick={nextStep}>Continue →</button>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- STEP 5 — PREFERENCES -->
+                <template if:true={isStep5}>
+                    <div class="step-panel">
+                        <div class="step-tag">Step 5 of 5</div>
+                        <h2 class="step-h2">Your <em>preferences</em></h2>
+                        <p class="step-sub">Choose the features that matter most to you.</p>
+
+                        <div class="pills-section">
+                            <div class="pills-title">🏠 Interior Features</div>
+                            <div class="pills-wrap">
+                                <template for:each={interiorList} for:item="p">
+                                    <div key={p.val} class={p.cls} data-group="interior" data-val={p.val} onclick={handlePill}>
+                                        {p.val}
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <div class="pills-section">
+                            <div class="pills-title">🌿 Outdoor Features</div>
+                            <div class="pills-wrap">
+                                <template for:each={outdoorList} for:item="p">
+                                    <div key={p.val} class={p.cls} data-group="outdoor" data-val={p.val} onclick={handlePill}>
+                                        {p.val}
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <div class="pills-section">
+                            <div class="pills-title">🌍 Lifestyle</div>
+                            <div class="pills-wrap">
+                                <template for:each={lifestyleList} for:item="p">
+                                    <div key={p.val} class={p.cls} data-group="lifestyle" data-val={p.val} onclick={handlePill}>
+                                        {p.val}
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <div class="field-full">
+                            <label class="field-label">ANYTHING ELSE?</label>
+                            <textarea class="field-textarea" placeholder="Any other requirements or notes for the agent..."
+                                      data-field="extraNotes" onchange={handleInput}></textarea>
+                        </div>
+
+                        <div class="nav-btns">
+                            <button class="btn-back" onclick={prevStep}>← Back</button>
+                            <button class={submitBtnCls} onclick={submitForm} disabled={isSubmitting}>
+                                <template if:false={isSubmitting}>
+                                    Submit to Agentforce ✓
+                                </template>
+                                <template if:true={isSubmitting}>
+                                    <span class="spinner"></span> Submitting...
+                                </template>
+                            </button>
+                        </div>
+
+                        <template if:true={errorMessage}>
+                            <div class="error-banner">{errorMessage}</div>
+                        </template>
+                    </div>
+                </template>
+
+            </div>
+        </main>
+    </div>
+</template>

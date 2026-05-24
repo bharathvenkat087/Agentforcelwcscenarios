@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
+    <flexiPageType>AppPage</flexiPageType>
+    <masterLabel>PropForce AI Prompt Builder</masterLabel>
+    <template>
+        <name>lightning_FlowRegion</name>
+    </template>
+    <regions>
+        <name>main</name>
+        <type>Region</type>
+        <mode>overwrite</mode>
+        <itemInstances>
+            <componentInstance>
+                <componentName>c:propforcePromptBuilder</componentName>
+            </componentInstance>
+        </itemInstances>
+    </regions>
+</FlexiPage>
