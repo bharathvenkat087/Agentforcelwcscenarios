@@ -1,0 +1,114 @@
+<template>
+    <div class="card-wrapper">
+
+        <!-- HEADER -->
+        <div class="card-header">
+            <div class="ch-left">
+                <div class="ch-avatar">{initials}</div>
+                <div>
+                    <div class="ch-name">{leadName}</div>
+                    <div class="ch-role">{buyerType} · {intent}</div>
+                </div>
+            </div>
+            <span class={statusCls}>{statusLabel}</span>
+        </div>
+
+        <!-- BODY -->
+        <div class="card-body">
+
+            <!-- BUDGET HERO -->
+            <template if:true={budget}>
+                <div class="budget-hero">
+                    <div class="bh-label">MAX BUDGET</div>
+                    <div class="bh-val">{budgetFormatted}</div>
+                    <div class="bh-sub">{intent} · {timeline}</div>
+                </div>
+            </template>
+
+            <!-- PROPERTY -->
+            <div class="section">
+                <div class="sec-title">🏠 Property Requirements</div>
+                <div class="fields-grid">
+                    <div class="field-item">
+                        <span class="fi-label">Type</span>
+                        <span class="fi-val">{propTypes}</span>
+                    </div>
+                    <div class="field-item">
+                        <span class="fi-label">Bedrooms</span>
+                        <span class="fi-val">{beds}</span>
+                    </div>
+                    <div class="field-item">
+                        <span class="fi-label">Bathrooms</span>
+                        <span class="fi-val">{baths}</span>
+                    </div>
+                    <div class="field-item">
+                        <span class="fi-label">Garage</span>
+                        <span class="fi-val">{garage}</span>
+                    </div>
+                    <div class="field-item">
+                        <span class="fi-label">Floors</span>
+                        <span class="fi-val">{floors}</span>
+                    </div>
+                    <template if:true={hasArea}>
+                        <div class="field-item">
+                            <span class="fi-label">Floor Area</span>
+                            <span class="fi-val">{areaStr} sqft</span>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- LOCATION -->
+            <div class="section">
+                <div class="sec-title">📍 Location &amp; Timeline</div>
+                <div class="fields-grid">
+                    <div class="field-item">
+                        <span class="fi-label">City</span>
+                        <span class="fi-val">{city}</span>
+                    </div>
+                    <template if:true={neighbourhood}>
+                        <div class="field-item">
+                            <span class="fi-label">Neighbourhood</span>
+                            <span class="fi-val">{neighbourhood}</span>
+                        </div>
+                    </template>
+                    <div class="field-item">
+                        <span class="fi-label">Timeline</span>
+                        <span class="fi-val">{timeline}</span>
+                    </div>
+                    <div class="field-item">
+                        <span class="fi-label">Contact Via</span>
+                        <span class="fi-val">{contactMethod}</span>
+                    </div>
+                </div>
+                <template if:true={proximity}>
+                    <div class="proximity-row">
+                        <span class="fi-label">Proximity</span>
+                        <span class="fi-val">{proximity}</span>
+                    </div>
+                </template>
+            </div>
+
+            <!-- FEATURES -->
+            <template if:true={hasFeatures}>
+                <div class="section">
+                    <div class="sec-title">✨ Desired Features</div>
+                    <div class="pills-wrap">
+                        <template for:each={allFeaturePills} for:item="pill">
+                            <span key={pill.val} class={pill.cls}>{pill.val}</span>
+                        </template>
+                    </div>
+                </div>
+            </template>
+
+            <!-- NOTES -->
+            <template if:true={notes}>
+                <div class="section">
+                    <div class="sec-title">📝 Agent Notes</div>
+                    <div class="notes-text">{notes}</div>
+                </div>
+            </template>
+
+        </div>
+    </div>
+</template>

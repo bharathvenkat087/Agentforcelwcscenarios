@@ -1,0 +1,76 @@
+<template>
+    <div class="prompt-wrapper">
+
+        <!-- HEADER -->
+        <div class="prompt-header">
+            <div class="header-left">
+                <div class="ai-icon">🤖</div>
+                <div>
+                    <div class="header-title">Agentforce AI Prompt</div>
+                    <div class="header-sub">Generated from lead preferences</div>
+                </div>
+            </div>
+            <div class="header-right">
+                <span class={statusCls}>{statusLabel}</span>
+                <button class="refresh-btn" onclick={generatePrompt} title="Regenerate">↻</button>
+            </div>
+        </div>
+
+        <!-- LOADING -->
+        <template if:true={isLoading}>
+            <div class="loading-box">
+                <div class="spinner"></div>
+                <span>Generating AI prompt...</span>
+            </div>
+        </template>
+
+        <!-- PROMPT OUTPUT -->
+        <template if:false={isLoading}>
+            <template if:true={promptText}>
+                <div class="prompt-box">
+                    <div class="prompt-label">📋 AGENT PROMPT</div>
+                    <div class="prompt-text">{promptText}</div>
+                    <div class="prompt-actions">
+                        <button class="action-btn copy-btn" onclick={copyPrompt}>
+                            {copyLabel}
+                        </button>
+                        <button class="action-btn send-btn" onclick={sendToAgentforce}>
+                            ⚡ Send to Agentforce
+                        </button>
+                    </div>
+                </div>
+
+                <!-- QUICK PROPERTY MATCH SUGGESTIONS -->
+                <div class="suggestions-box">
+                    <div class="sug-title">🏠 Quick Property Match Criteria</div>
+                    <div class="tags-wrap">
+                        <template for:each={matchTags} for:item="tag">
+                            <span key={tag} class="match-tag">{tag}</span>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- LEAD SCORE -->
+                <div class="score-box">
+                    <div class="score-left">
+                        <div class="score-label">Lead Quality Score</div>
+                        <div class="score-bar-wrap">
+                            <div class="score-bar" style={scoreBarStyle}></div>
+                        </div>
+                        <div class="score-sub">{scoreLabel}</div>
+                    </div>
+                    <div class="score-num">{leadScore}</div>
+                </div>
+            </template>
+
+            <template if:false={promptText}>
+                <div class="empty-box">
+                    <div class="empty-icon">💡</div>
+                    <div class="empty-text">No preferences found yet</div>
+                    <div class="empty-sub">Complete the intake form to generate an AI prompt</div>
+                </div>
+            </template>
+        </template>
+
+    </div>
+</template>

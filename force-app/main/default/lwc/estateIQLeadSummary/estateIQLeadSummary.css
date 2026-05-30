@@ -1,0 +1,109 @@
+:host {
+    display: block;
+    --green:        #2D4A3E;
+    --orange:       #C4622D;
+    --orange-light: #d4734a;
+    --cream:        #F5F0E8;
+    --cream-dark:   #EDE8DC;
+    --ink:          #1A1612;
+    --stone:        #7A7060;
+    --border:       rgba(26,22,18,0.1);
+    --white:        #FAFAF7;
+    --blue:         #2563EB;
+    font-family: 'Salesforce Sans', Arial, sans-serif;
+}
+
+.card-wrapper {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* ── HEADER ───────────────────────────────────────────────────────────────── */
+.card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px;
+    background: var(--green); color: #fff;
+}
+.ch-left   { display: flex; align-items: center; gap: 12px; }
+.ch-avatar {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: var(--orange); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 700; flex-shrink: 0;
+}
+.ch-name { font-size: 16px; font-weight: 600; color: #fff; }
+.ch-role { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+
+/* ── STATUS ───────────────────────────────────────────────────────────────── */
+.status-badge {
+    font-size: 10px; font-weight: 600; padding: 4px 10px;
+    border-radius: 99px; letter-spacing: 0.05em;
+}
+.s-new       { background: rgba(196,98,45,0.2);  color: #ffb085; }
+.s-working   { background: rgba(74,222,128,0.2); color: #4ade80; }
+.s-converted { background: rgba(96,165,250,0.2); color: #93c5fd; }
+.s-closed    { background: rgba(255,255,255,0.1);color: rgba(255,255,255,0.5); }
+
+/* ── BODY ─────────────────────────────────────────────────────────────────── */
+.card-body { padding: 16px; }
+
+/* ── BUDGET HERO ──────────────────────────────────────────────────────────── */
+.budget-hero {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 14px;
+    text-align: center;
+}
+.bh-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 600; color: var(--stone); margin-bottom: 4px; }
+.bh-val   { font-size: 36px; font-weight: 300; color: var(--orange); line-height: 1; }
+.bh-sub   { font-size: 12px; color: var(--stone); margin-top: 4px; }
+
+/* ── SECTIONS ─────────────────────────────────────────────────────────────── */
+.section        { margin-bottom: 14px; }
+.sec-title {
+    font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+    font-weight: 600; color: var(--stone); margin-bottom: 10px;
+    display: flex; align-items: center; gap: 6px;
+}
+.sec-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+.fields-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 2px;
+}
+.field-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 7px 10px; background: var(--cream-dark);
+    font-size: 12px;
+}
+.field-item:nth-child(odd) { background: var(--cream); }
+
+.fi-label { color: var(--stone); font-weight: 500; }
+.fi-val   { font-weight: 600; color: var(--ink); text-align: right; }
+
+.proximity-row {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 8px 10px; background: var(--cream); border-radius: 6px;
+    margin-top: 4px; font-size: 12px; gap: 12px;
+}
+
+/* ── PILLS ────────────────────────────────────────────────────────────────── */
+.pills-wrap { display: flex; flex-wrap: wrap; gap: 5px; }
+.pill {
+    padding: 4px 11px; border-radius: 99px;
+    font-size: 11px; font-weight: 500;
+}
+.pill-green  { background: rgba(45,74,62,0.09);  color: var(--green); }
+.pill-blue   { background: rgba(37,99,235,0.08); color: var(--blue);  }
+.pill-orange { background: rgba(196,98,45,0.09); color: var(--orange);}
+
+/* ── NOTES ────────────────────────────────────────────────────────────────── */
+.notes-text {
+    font-size: 12px; color: var(--stone); line-height: 1.65;
+    background: var(--cream); padding: 10px 12px;
+    border-radius: 8px; border: 1px solid var(--border);
+}

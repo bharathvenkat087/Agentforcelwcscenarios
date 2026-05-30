@@ -1,0 +1,160 @@
+<template>
+    <div class="header-wrapper">
+
+        <!-- TOP ROW -->
+        <div class="top-row">
+            <div class="lead-identity">
+                <div class="avatar">{initials}</div>
+                <div class="lead-info">
+                    <div class="lead-type-label">Lead</div>
+                    <div class="lead-name">{fullName}</div>
+                    <div class="lead-company">{company}</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <lightning-button-icon
+                    icon-name="utility:like"
+                    variant="border"
+                    size="small"
+                    title="Follow"
+                    onclick={handleFollow}>
+                </lightning-button-icon>
+                <lightning-button
+                    label="New Case"
+                    icon-name="utility:case"
+                    variant="neutral"
+                    size="small"
+                    onclick={handleNewCase}>
+                </lightning-button>
+                <lightning-button
+                    label="New Note"
+                    icon-name="utility:note"
+                    variant="neutral"
+                    size="small"
+                    onclick={handleNewNote}>
+                </lightning-button>
+                <lightning-button
+                    label="Submit for Approval"
+                    icon-name="utility:approval"
+                    variant="neutral"
+                    size="small"
+                    onclick={handleApproval}>
+                </lightning-button>
+                <lightning-button
+                    label="Mark Complete"
+                    icon-name="utility:check"
+                    variant="brand"
+                    size="small"
+                    onclick={handleMarkComplete}>
+                </lightning-button>
+            </div>
+        </div>
+
+        <!-- META BAR -->
+        <div class="meta-bar">
+            <template if:true={phone}>
+                <div class="meta-item">
+                    <lightning-icon icon-name="utility:call" size="x-small" class="meta-icon"></lightning-icon>
+                    <div class="meta-content">
+                        <span class="meta-label">Phone</span>
+                        <a href={phoneHref} class="meta-value meta-link">{phone}</a>
+                    </div>
+                </div>
+            </template>
+            <template if:true={email}>
+                <div class="meta-item">
+                    <lightning-icon icon-name="utility:email" size="x-small" class="meta-icon"></lightning-icon>
+                    <div class="meta-content">
+                        <span class="meta-label">Email</span>
+                        <a href={emailHref} class="meta-value meta-link">{email}</a>
+                    </div>
+                </div>
+            </template>
+            <template if:true={company}>
+                <div class="meta-item">
+                    <lightning-icon icon-name="utility:company" size="x-small" class="meta-icon"></lightning-icon>
+                    <div class="meta-content">
+                        <span class="meta-label">Company</span>
+                        <span class="meta-value">{company}</span>
+                    </div>
+                </div>
+            </template>
+            <template if:true={city}>
+                <div class="meta-item">
+                    <lightning-icon icon-name="utility:location" size="x-small" class="meta-icon"></lightning-icon>
+                    <div class="meta-content">
+                        <span class="meta-label">Location</span>
+                        <span class="meta-value">{locationDisplay}</span>
+                    </div>
+                </div>
+            </template>
+            <template if:true={budgetFormatted}>
+                <div class="meta-item">
+                    <lightning-icon icon-name="utility:moneybag" size="x-small" class="meta-icon"></lightning-icon>
+                    <div class="meta-content">
+                        <span class="meta-label">Budget</span>
+                        <span class="meta-value meta-budget">{budgetFormatted}</span>
+                    </div>
+                </div>
+            </template>
+            <template if:true={timeline}>
+                <div class="meta-item">
+                    <lightning-icon icon-name="utility:clock" size="x-small" class="meta-icon"></lightning-icon>
+                    <div class="meta-content">
+                        <span class="meta-label">Timeline</span>
+                        <span class="meta-value">{timeline}</span>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <!-- STATUS PATH -->
+        <div class="status-path">
+            <template for:each={statusSteps} for:item="step">
+                <div key={step.id} class={step.wrapperClass}>
+                    <div class={step.dotClass}>
+                        <lightning-icon
+                            icon-name={step.stepIcon}
+                            size="xx-small"
+                            class="step-icon">
+                        </lightning-icon>
+                    </div>
+                    <span class={step.labelClass}>{step.stepLabel}</span>
+                    <template if:false={step.isLast}>
+                        <div class={step.lineClass}></div>
+                    </template>
+                </div>
+            </template>
+        </div>
+
+        <!-- SCORE + TAGS + ACTIONS -->
+        <div class="score-bar">
+            <div class={scoreClass}>
+                <lightning-icon icon-name="utility:rating" size="xx-small"></lightning-icon>
+                <span>Lead score: {leadScore} — {scoreLabel}</span>
+            </div>
+            <div class="quick-tags">
+                <template for:each={quickTags} for:item="tag">
+                    <span key={tag} class="qtag">{tag}</span>
+                </template>
+            </div>
+            <div class="score-actions">
+                <lightning-button
+                    label="Edit Preferences"
+                    icon-name="utility:edit"
+                    variant="neutral"
+                    size="small"
+                    onclick={handleEditPreferences}>
+                </lightning-button>
+                <lightning-button
+                    label="Generate AI Prompt"
+                    icon-name="utility:einstein"
+                    variant="brand"
+                    size="small"
+                    onclick={handleGeneratePrompt}>
+                </lightning-button>
+            </div>
+        </div>
+
+    </div>
+</template>
